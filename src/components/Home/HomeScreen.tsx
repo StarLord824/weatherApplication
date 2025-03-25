@@ -3,6 +3,7 @@ import Graph from "./Graph";
 import Stats from "./Stats";
 import Sidebar from "../Sidebar/Sidebar";
 import LoadingAnimation from "../common/Loading";
+import SettingsIcon from "../Settings/SettingsIcon";
 
 import {
   getWeatherData,
@@ -68,6 +69,7 @@ const HomeScreen = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-400 to-blue-800">
         <Sidebar onCitySelect={handleCitySelect} />
+        <SettingsIcon />
         <div className="pl-16 p-6 flex items-center justify-center">
           <div className="text-white text-xl">{error}</div>
         </div>
@@ -76,14 +78,18 @@ const HomeScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-blue-800">
+    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500">
       <Sidebar onCitySelect={handleCitySelect} />
+      <SettingsIcon />
 
       <div className="pl-16">
         <div className="p-6">
           <div className="max-w-md mx-auto bg-white/20 rounded-xl backdrop-blur-lg shadow-lg p-6">
             {loading ? (
-              <div className="text-white text-center py-20"> <LoadingAnimation/> </div>
+              <div className="text-white text-center py-20">
+                {" "}
+                <LoadingAnimation />{" "}
+              </div>
             ) : (
               <>
                 {/* City Name */}
