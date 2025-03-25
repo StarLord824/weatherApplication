@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Graph from "./Graph";
 import Stats from "./Stats";
 import Sidebar from "../Sidebar/Sidebar";
+import LoadingAnimation from "../common/Loading";
+
 import {
   getWeatherData,
   getCityCoordinates,
@@ -81,7 +83,7 @@ const HomeScreen = () => {
         <div className="p-6">
           <div className="max-w-md mx-auto bg-white/20 rounded-xl backdrop-blur-lg shadow-lg p-6">
             {loading ? (
-              <div className="text-white text-center py-20">Loading...</div>
+              <div className="text-white text-center py-20"> <LoadingAnimation/> </div>
             ) : (
               <>
                 {/* City Name */}
@@ -107,23 +109,13 @@ const HomeScreen = () => {
                 {/* Graph and Stats Section */}
                 <div className="space-y-4">
                   <div className="bg-white/10 rounded-lg p-4">
-                    {/* <Graph data={weatherData?.hourlyData} /> */}
-                    <h1>hi</h1>
+                    <Graph hourlyData={weatherData?.hourlyData} />
                   </div>
                   <div className="bg-white/10 rounded-lg p-4">
-                    {/* <Stats
-                      data={weatherData?.dailyData}
-                      current={{
-                        humidity:
-                          weatherData?.current.relative_humidity_2m ?? 0,
-                        windSpeed: weatherData?.current.wind_speed_10m ?? 0,
-                        pressure: weatherData?.current.pressure_msl ?? 0,
-                        feelsLike:
-                          weatherData?.current.apparent_temperature ?? 0,
-                        uvIndex: weatherData?.dailyData.uv_index_max[0] ?? 0,
-                      }}
-                    /> */}
-                    <h1>hi</h1>
+                    <Stats
+                      dailyData={weatherData?.dailyData}
+                      current={weatherData?.current}
+                    />
                   </div>
                 </div>
               </>

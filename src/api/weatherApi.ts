@@ -70,9 +70,9 @@ export async function getWeatherData(
       `https://api.open-meteo.com/v1/forecast?` +
         `latitude=${latitude}&` +
         `longitude=${longitude}&` +
-        `current=temperature_2m,weather_code&` +
+        `current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m,apparent_temperature,pressure_msl&` +
         `hourly=temperature_2m,precipitation_probability,weather_code&` +
-        `daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&` +
+        `daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset,uv_index_max&` +
         `timezone=auto`
     );
 
