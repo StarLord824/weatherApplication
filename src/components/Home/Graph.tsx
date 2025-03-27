@@ -117,9 +117,6 @@ const Graph = ({ hourlyData, isLoading }: GraphProps) => {
 
   return (
     <div>
-      <h3 className="text-white text-lg font-semibold mb-4">
-        24-Hour Forecast
-      </h3>
       <Line options={options} data={chartData} />
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Graph from "./Graph";
 import Stats from "./Stats";
 import Sidebar from "../Sidebar/Sidebar";
@@ -10,6 +10,7 @@ import {
   getCityCoordinates,
   getWeatherDescription,
 } from "../../api/weatherApi";
+import { FaLongArrowAltDown, FaLongArrowAltUp } from "react-icons/fa";
 
 interface WeatherData {
   currentTemp: number;
@@ -36,17 +37,18 @@ interface WeatherData {
 }
 
 const HomeScreen = () => {
-  const [selectedCity, setSelectedCity] = useState("London"); // Default city
+  const [selectedCity, setSelectedCity] = useState("Delhi"); // Default city
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentLogo, setCurrentLogo] = useState<string | null>('../../assets/weatherLogos/cloudy.svg');
 
   const fetchWeatherData = async (city: string) => {
     try {
       setLoading(true);
       setError(null);
       const coords = await getCityCoordinates(city);
-      const data = await getWeatherData(coords.lat, coords.lon);
+      const data: WeatherData = await getWeatherData(coords.lat, coords.lon);
       setWeatherData(data);
     } catch (err) {
       setError(
@@ -84,7 +86,7 @@ const HomeScreen = () => {
 
       <div className="pl-16">
         <div className="p-6">
-          <div className="max-w-md mx-auto bg-white/20 rounded-xl backdrop-blur-lg shadow-lg p-6">
+          <div className="max-w-md mx-auto bg-black/60 rounded-xl backdrop-blur-lg shadow-lg p-6">
             {loading ? (
               <div className="text-white text-center py-20">
                 {" "}
@@ -98,18 +100,27 @@ const HomeScreen = () => {
                 </div>
 
                 {/* Temperature and Weather */}
-                <div className="text-center mb-6">
+                <div className="flex justify-around text-center mb-6">
                   <div className="text-6xl font-bold text-white mb-2">
                     {Math.round(weatherData?.currentTemp ?? 0)}°
                   </div>
-                  <div className="text-xl text-white/90">
-                    {getWeatherDescription(weatherData?.weatherCode ?? 0)}
+                  <div className="flex flex-col justify-around text-white/90">
+                    <div className="text-xl font-bold">
+                      {getWeatherDescription(weatherData?.weatherCode ?? 0)}
+                    </div>
+                    <div>
+                      {<FaLongArrowAltUp className="text-red-400 relative bottom-0.5 inline-block" />} 21°   <FaLongArrowAltDown className="text-blue-400 relative bottom-0.5 inline-block"/> 37°
+                    </div>
                   </div>
                 </div>
 
                 {/* Weather Icon/Logo */}
-                <div className="flex justify-center mb-6">
-                  {/* Add your weather icon here based on weatherCode */}
+                <div className="flex justify-center my-6">
+                  <img
+                    src={currentLogo}
+                    alt="Weather Icon"
+                    className="w-36 h-36"
+                  />
                 </div>
 
                 {/* Graph and Stats Section */}

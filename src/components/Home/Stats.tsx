@@ -9,7 +9,7 @@ import {
 } from "react-icons/fi";
 import Loading from "../common/Loading";
 
-interface StatsProps {
+interface WeatherStats {
   dailyData?: {
     date: string[];
     maxTemp: number[];
@@ -20,6 +20,7 @@ interface StatsProps {
     uvIndex: number[];
   };
   current?: {
+    temp: number;
     windSpeed: number;
     humidity: number;
     feelsLike: number;
@@ -46,7 +47,38 @@ const StatCard = ({
   </div>
 );
 
-const Stats = ({ dailyData, current, isLoading }: StatsProps) => {
+const DayForecast = ({
+  day,
+  min,
+  max,
+  precipitation,
+}: {
+  day: string;
+  min: number;
+  max: number;
+  precipitation: number;
+}) => (
+  <div className="flex items-center justify-between text-white p-2 rounded-lg hover:bg-white/10">
+    <div className="w-24">
+      {new Date(day).toLocaleDateString("en-US", { weekday: "short" })}
+    </div>
+    <div className="flex items-center space-x-4">
+      <span className="text-white/60">{Math.round(precipitation)}%</span>
+      <span>{Math.round(min)}°</span>
+      <div className="w-20 h-1 bg-white/20 rounded">
+        <div
+          className="h-full bg-white rounded"
+          style={{
+            width: `${((max - min) / 40) * 100}%`,
+          }}
+        />
+      </div>
+      <span>{Math.round(max)}°</span>
+    </div>
+  </div>
+);
+
+const Stats = ({ dailyData, current, isLoading }: WeatherStats) => {
   if (isLoading) {
     return (
       <div className="h-[400px] flex items-center justify-center">
@@ -55,12 +87,15 @@ const Stats = ({ dailyData, current, isLoading }: StatsProps) => {
     );
   }
 
-  if (!dailyData || !current) return null;
+  if (!dailyData || !current) {
+    return null;
+  }
 
   return (
     <div>
+      {/* Current Weather Details */}
       <h3 className="text-white text-lg font-semibold mb-4">Weather Details</h3>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 mb-6">
         <StatCard
           icon={<FiThermometer />}
           title="Feels Like"
@@ -99,39 +134,17 @@ const Stats = ({ dailyData, current, isLoading }: StatsProps) => {
         />
       </div>
 
-      {/* Daily Forecast */}
-      <h3 className="text-white text-lg font-semibold mt-6 mb-4">
-        7-Day Forecast
-      </h3>
+      {/* 7-Day Forecast */}
+      <h3 className="text-white text-lg font-semibold mb-4">7-Day Forecast</h3>
       <div className="space-y-2">
         {dailyData.date.map((date, index) => (
-          <div
+          <DayForecast
             key={date}
-            className="flex items-center justify-between text-white p-2 rounded-lg hover:bg-white/10"
-          >
-            <div className="w-24">
-              {new Date(date).toLocaleDateString("en-US", { weekday: "short" })}
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-white/60">
-                {Math.round(dailyData.precipitationProb[index])}%
-              </span>
-              <span>{Math.round(dailyData.minTemp[index])}°</span>
-              <div className="w-20 h-1 bg-white/20 rounded">
-                <div
-                  className="h-full bg-white rounded"
-                  style={{
-                    width: `${
-                      ((dailyData.maxTemp[index] - dailyData.minTemp[index]) /
-                        40) *
-                      100
-                    }%`,
-                  }}
-                />
-              </div>
-              <span>{Math.round(dailyData.maxTemp[index])}°</span>
-            </div>
-          </div>
+            day={date}
+            min={dailyData.minTemp[index]}
+            max={dailyData.maxTemp[index]}
+            precipitation={dailyData.precipitationProb[index]}
+          />
         ))}
       </div>
     </div>
