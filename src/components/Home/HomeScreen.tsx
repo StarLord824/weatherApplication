@@ -5,10 +5,11 @@ import Sidebar from "../Sidebar/Sidebar";
 import LoadingAnimation from "../common/Loading";
 import SettingsIcon from "../Settings/SettingsIcon";
 
+import { getCityCoordinates } from "../../api/getCoordinates";
 import {
   getWeatherData,
-  getCityCoordinates,
   getWeatherDescription,
+  getWeatherLogo,
 } from "../../api/weatherApi";
 import { FaLongArrowAltDown, FaLongArrowAltUp } from "react-icons/fa";
 
@@ -26,22 +27,38 @@ interface WeatherData {
     maxTemp: number[];
     minTemp: number[];
     precipitationProb: number[];
-    uv_index_max: number[];
-  };
-  current: {
-    relative_humidity_2m: number;
-    wind_speed_10m: number;
-    pressure_msl: number;
-    apparent_temperature: number;
   };
 }
+// interface WeatherData {
+//   currentTemp: number;
+//   weatherCode: number;
+//   hourlyData: {
+//     time: string[];
+//     temp: number[];
+//     precipitation: number[];
+//     weatherCode: number[];
+//   };
+//   dailyData: {
+//     date: string[];
+//     maxTemp: number[];
+//     minTemp: number[];
+//     precipitationProb: number[];
+//     uv_index_max: number[];
+//   };
+//   current: {
+//     relative_humidity_2m: number;
+//     wind_speed_10m: number;
+//     pressure_msl: number;
+//     apparent_temperature: number;
+//   };
+// }
 
 const HomeScreen = () => {
   const [selectedCity, setSelectedCity] = useState("Delhi"); // Default city
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentLogo, setCurrentLogo] = useState<string | null>('../../assets/weatherLogos/cloudy.svg');
+  const [currentLogo, setCurrentLogo] = useState<string | null>(null);
 
   const fetchWeatherData = async (city: string) => {
     try {
@@ -49,6 +66,8 @@ const HomeScreen = () => {
       setError(null);
       const coords = await getCityCoordinates(city);
       const data: WeatherData = await getWeatherData(coords.lat, coords.lon);
+      const logo=getWeatherLogo(data.weatherCode);
+      setCurrentLogo(logo);
       setWeatherData(data);
     } catch (err) {
       setError(
@@ -83,7 +102,6 @@ const HomeScreen = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500">
       <Sidebar onCitySelect={handleCitySelect} />
       <SettingsIcon />
-
       <div className="pl-16">
         <div className="p-6">
           <div className="max-w-md mx-auto bg-black/60 rounded-xl backdrop-blur-lg shadow-lg p-6">
