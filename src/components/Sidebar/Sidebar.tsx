@@ -10,7 +10,7 @@ interface SidebarProps {
 const Sidebar = ({ onCitySelect }: SidebarProps) => {
   const [isOpen, setIsOpen] = useState(true);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [favoriteLocations] = useState(["Bangalore", "Mumbai", "Kanpur"]);
+  const [favoriteLocations] = useState(["Bangalore", "Mumbai", "Kanpur", "Pune"]);
   useHotkeys("ctrl+k, meta+k", (event) => {
     event.preventDefault();
     setIsSearchOpen((prev) => !prev);
@@ -22,7 +22,7 @@ const Sidebar = ({ onCitySelect }: SidebarProps) => {
       {/* Sidebar */}
       <div
         className={`fixed left-0 top-0 h-full bg-white/10 backdrop-blur-lg transition-all duration-300 z-10 ${
-          isOpen ? "w-56" : "w-16"
+          isOpen ? "w-45" : "w-15"
         }`}
       >
         {/* Toggle Button */}

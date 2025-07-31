@@ -1,3 +1,5 @@
+import WeatherData from "../interfaces/weatherData";
+
 interface WeatherResponse {
   current: {
     temperature_2m: number;
@@ -22,23 +24,6 @@ interface WeatherResponse {
     sunrise: string[];
     sunset: string[];
     uv_index_max: number[];
-  };
-}
-
-interface WeatherData {
-  currentTemp: number;
-  weatherCode: number;
-  hourlyData: {
-    time: string[];
-    temp: number[];
-    precipitation: number[];
-    weatherCode: number[];
-  };
-  dailyData: {
-    date: string[];
-    maxTemp: number[];
-    minTemp: number[];
-    precipitationProb: number[];
   };
 }
 
@@ -78,19 +63,24 @@ export async function getWeatherData(
   longitude: number
 ): Promise<WeatherData> {
   try {
+    
     const response = await fetch(
-      `https://api.open-meteo.com/v1/forecast?` +
+        `https://api.open-meteo.com/v1/forecast?` +
         `latitude=${latitude}&` +
         `longitude=${longitude}&` +
         `current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m,apparent_temperature,pressure_msl&` +
-        `hourly=temperature_2m,precipitation_probability,weather_code&` +
-        `daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset,uv_index_max&` +
+        `hourly=temperature_2m,precipitation_probability,precipitation,weather_code,visibility&` +
+        `daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,sunrise,sunset,uv_index_max&` +
+        `temperature_unit=celsius&` +
+        `wind_speed_unit=kmh&` +
+        `precipitation_unit=mm&` +
         `timezone=auto`
-    );
+      );
 
     if (!response.ok) {
       throw new Error("Weather data fetch failed");
     }
+    // const data: WeatherResponse = response[0];
     const data: WeatherResponse = await response.json();
     // console.log('after', data)
     return {
@@ -107,6 +97,12 @@ export async function getWeatherData(
         maxTemp: data.daily.temperature_2m_max,
         minTemp: data.daily.temperature_2m_min,
         precipitationProb: data.daily.precipitation_probability_max,
+      },
+      current: {
+        relative_humidity_2m: data.current.relative_humidity_2m,
+        wind_speed_10m: data.current.wind_speed_10m,
+        pressure_msl: data.current.pressure_msl,
+        apparent_temperature: data.current.apparent_temperature,
       },
     };
   } catch (error) {

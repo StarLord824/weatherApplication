@@ -1,7 +1,7 @@
 // Simplified geocoding using Open-Meteo Geocoding API
 export async function getCityCoordinates(
   city: string
-): Promise<{ lat: number; lon: number }> {
+): Promise<{ city: string; lat: number; lon: number }> {
   try {
     const response = await fetch(
       `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
@@ -20,6 +20,7 @@ export async function getCityCoordinates(
     }
 
     return {
+      city,
       lat: data.results[0].latitude,
       lon: data.results[0].longitude,
     };
