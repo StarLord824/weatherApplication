@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FiSearch, FiMenu, FiMapPin } from "react-icons/fi";
 import SearchModal from "./SearchModal";
 import { useHotkeys } from "react-hotkeys-hook";

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import Graph from "./HourlyData";
-import Stats from "./Stats";
+// import Stats from "./Stats";
 import Sidebar from "../Sidebar/Sidebar";
 import LoadingAnimation from "../common/Loading";
 import SettingsIcon from "../Settings/SettingsIcon";
+// import { WiCloud } from "react-icons/wi"; // Cloudy icon
 
 import { getCityCoordinates } from "../../api/getCoordinates";
 import {
@@ -44,6 +45,7 @@ const HomeScreen = () => {
       setSelectedCity(coords.city);
       setCurrentLogo(logo);
       setWeatherData(data);
+      console.log(data);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch weather data"
@@ -87,17 +89,29 @@ const HomeScreen = () => {
           ) : (
             <>
               {/* City Name */}
-              <div className="text-3xl font-bold text-white mb-4 text-center">
+              <div className="text-3xl font-bold text-white px-18 mt-5 mb-10 ">
                 {selectedCity
                   ? selectedCity.charAt(0).toUpperCase() + selectedCity.slice(1)
                   : ""}
               </div>
 
               {/* Temperature and Weather */}
-              <div className="flex justify-around items-start text-center mb-2">
-                <div className="text-6xl font-bold text-white mb-2">
-                  {Math.round(weatherData?.currentTemp ?? 0)}°
+              <div className="flex justify-around items-start text-center mb-2 w-7/10">
+                <div className="flex flex-col">
+                  <div className="flex items-end text-6xl font-bold text-white mb-2">
+                    <div>{Math.round(weatherData?.currentTemp ?? 0)}°</div>
+                    <div className="text-xl pb-1 pl-4 font-semibold">
+                      <FaLongArrowAltUp className="text-red-400 relative bottom-0.5 inline-block" />{" "}
+                      {weatherData?.dailyData?.maxTemp[0]}°{" "}
+                      <FaLongArrowAltDown className="text-blue-400 relative bottom-0.5 inline-block" />{" "}
+                      {weatherData?.dailyData?.minTemp[0]}°
+                    </div>
+                  </div>
+                  <div className="text-xl font-medium text-white/90 my-4 flex pl-4">
+                    {getWeatherDescription(weatherData?.weatherCode ?? 0)}
+                  </div>
                 </div>
+
                 {/* Weather Icon/Logo */}
                 <div className="flex justify-center">
                   <img
@@ -106,23 +120,10 @@ const HomeScreen = () => {
                     className="w-30 h-30"
                   />
                 </div>
-                <div className="flex flex-col justify-around text-white/90">
-                  <div className="text-xl font-bold">
-                    {getWeatherDescription(weatherData?.weatherCode ?? 0)}
-                  </div>
-                  <div>
-                    {
-                      <FaLongArrowAltUp className="text-red-400 relative bottom-0.5 inline-block" />
-                    }{" "}
-                    21°{" "}
-                    <FaLongArrowAltDown className="text-blue-400 relative bottom-0.5 inline-block" />{" "}
-                    37°
-                  </div>
-                </div>
               </div>
 
               {/* hourly and daily forecast */}
-              <div className="h-40 w-full flex  justify-center items-center">
+              <div className="flex justify-around items-center gap-4 h-80 w-full">
                 {weatherData?.hourlyData && (
                   <HourlyForecast hourlyData={weatherData.hourlyData} />
                 )}
@@ -130,6 +131,7 @@ const HomeScreen = () => {
                   <DailyForecast dailyData={weatherData.dailyData} />
                 )}
               </div>
+              <Stats />
             </>
           )}
         </div>
@@ -138,9 +140,13 @@ const HomeScreen = () => {
   );
 };
 
+export function Stats() {
+  return <></>;
+}
+
 export function HourlyForecast({ hourlyData }: { hourlyData: HourlyData }) {
   return (
-    <div className="bg-white/10 rounded-lg p-4">
+    <div className="bg-white/10 p-4 rounded-xl h-75 w-1/2">
       <div className="text-xl font-bold text-white mb-2">Hourly Forecast</div>
       <Graph hourlyData={hourlyData} />
     </div>
@@ -148,50 +154,82 @@ export function HourlyForecast({ hourlyData }: { hourlyData: HourlyData }) {
 }
 
 export function DailyForecast({ dailyData }: { dailyData: DailyData }) {
+  const [showAll, setShowAll] = useState(false);
   if (!dailyData) return null;
+
+  // const todayStr = new Date().toISOString().slice(0, 10);
+  const daysToShow = showAll ? dailyData.date.length : 3;
+
   return (
-    <div className="bg-white/10 rounded-lg p-4 mt-4">
-      <div className="text-xl font-bold text-white mb-4 text-center">
+    <div className="bg-white/10 rounded-xl p-4 h-75 w-1/2 flex flex-col overflow-y-scroll">
+      <div className="text-xl font-bold text-white mb-4 ">
         Daily Forecast
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {dailyData.date.map((date, index) => (
-          <div
-            key={date}
-            className="flex flex-col items-center bg-black/30 rounded-lg p-3 shadow"
-          >
-            <div className="text-white text-lg font-semibold mb-1">
-              {new Date(date).toLocaleDateString("en-US", { weekday: "short" })}
+      <div className="flex flex-col gap-1.5">
+        {dailyData.date.slice(0, daysToShow).map((date, index) => {
+          // const isToday = date === todayStr;
+          return (
+            <div
+              key={date}
+              className="flex items-center bg-black/30 rounded-lg px-4 py-2 shadow w-full"
+            >
+              
+              
+              {/* Weekday or Today */}
+              <div className="w-20 text-white text-base font-semibold">
+                {index==0
+                  ? "Today"
+                  : new Date(date).toLocaleDateString("en-US", {
+                      weekday: "short",
+                    })}
+              </div>
+              
+              {/* Cloudy Icon */}
+              <div className="text-2xl text-blue-200 mx-2" >
+                  <img src={'/weatherLogos/cloudy.svg'} alt="Cloudy Icon" className="w-10 h-10" />
+              </div>
+
+              {/* Precipitation */}
+              <div className="w-16 text-blue-300 text-xs font-medium">
+                {Math.round(dailyData.precipitationProb[index])}%
+              </div>
+              {/* Temp Range Bar */}
+              <div className="flex-1 flex items-center mx-2">
+                <span className="text-blue-200 text-sm mr-1">
+                  {Math.round(dailyData.minTemp[index])}°
+                </span>
+                <div className="relative w-full h-2 bg-white/20 rounded mx-1">
+                  <div
+                    className="absolute h-2 bg-gradient-to-r from-blue-400 to-red-400 rounded"
+                    style={{
+                      left: 0,
+                      width: `${
+                        ((dailyData.maxTemp[index] - dailyData.minTemp[index]) /
+                          40) *
+                        100
+                      }%`,
+                      minWidth: "10%",
+                    }}
+                  />
+                </div>
+                <span className="text-red-200 text-sm ml-1">
+                  {Math.round(dailyData.maxTemp[index])}°
+                </span>
+              </div>
+                
             </div>
-            <div className="flex items-center space-x-2 mb-2">
-              <span className="text-blue-200 text-sm">
-                {Math.round(dailyData.minTemp[index])}°
-              </span>
-              <span className="text-white/60 text-xs">/</span>
-              <span className="text-red-200 text-sm">
-                {Math.round(dailyData.maxTemp[index])}°
-              </span>
-            </div>
-            <div className="w-full h-2 bg-white/20 rounded mb-2">
-              <div
-                className="h-full bg-gradient-to-r from-blue-400 to-red-400 rounded"
-                style={{
-                  width: `${
-                    ((dailyData.maxTemp[index] - dailyData.minTemp[index]) /
-                      40) *
-                    100
-                  }%`,
-                  minWidth: "10%",
-                }}
-              />
-            </div>
-            <div className="text-blue-300 text-xs">
-              Precip: {Math.round(dailyData.precipitationProb[index])}%
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
-    </div>
+      {dailyData.date.length > 2 && (
+        <button
+          className="mt-4 mx-auto py-1 w-4/5 bg-black/20 text-white rounded hover:bg-black/50 transition"
+          onClick={() => setShowAll((prev) => !prev)}
+        >
+          {showAll ? "Show Less" : "Show More"}
+        </button>
+      )}
+  </div>
   );
 }
 export default HomeScreen;

@@ -32,7 +32,6 @@ export interface DailyData {
     sunrise: string[];
     sunset: string[];
     uvIndex: number[];
-    weatherCode: number[];
 };
 // export interface WeatherData {
 //   latitude: number;

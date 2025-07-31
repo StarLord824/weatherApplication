@@ -1,31 +1,5 @@
 import WeatherData from "../interfaces/weatherData";
-
-interface WeatherResponse {
-  current: {
-    temperature_2m: number;
-    weather_code: number;
-    wind_speed_10m: number;
-    relative_humidity_2m: number;
-    apparent_temperature: number;
-    pressure_msl: number;
-    time: string;
-  };
-  hourly: {
-    time: string[];
-    temperature_2m: number[];
-    precipitation_probability: number[];
-    weather_code: number[];
-  };
-  daily: {
-    time: string[];
-    temperature_2m_max: number[];
-    temperature_2m_min: number[];
-    precipitation_probability_max: number[];
-    sunrise: string[];
-    sunset: string[];
-    uv_index_max: number[];
-  };
-}
+import WeatherResponse from "../interfaces/weatherResponse";
 
 const weatherCodeMap: { [key: number]: string } = {
   0: "Clear sky",
@@ -58,14 +32,44 @@ const weatherCodeMap: { [key: number]: string } = {
   99: "Thunderstorm with heavy hail",
 };
 
+const weatherLogoMap: { [key: number]: string } = {
+  0: "/weatherLogos/sunny.svg",
+  1: "/weatherLogos/partly_cloudy.svg",
+  2: "/weatherLogos/partly_cloudy.svg",
+  3: "/weatherLogos/cloudy.svg",
+  45: "/weatherLogos/cloudyNight.svg",
+  48: "/weatherLogos/cloudyNight.svg",
+  51: "/weatherLogos/rain.svg",
+  53: "/weatherLogos/rain.svg",
+  55: "/weatherLogos/rain.svg",
+  56: "/weatherLogos/rain.svg",
+  57: "/weatherLogos/rain.svg",
+  61: "/weatherLogos/rain.svg",
+  63: "/weatherLogos/rain.svg",
+  65: "/weatherLogos/rain.svg",
+  66: "/weatherLogos/snow.svg",
+  67: "/weatherLogos/snow.svg",
+  71: "/weatherLogos/snow.svg",
+  73: "/weatherLogos/snow.svg",
+  75: "/weatherLogos/snow.svg",
+  77: "/weatherLogos/snow.svg",
+  80: "/weatherLogos/rain.svg",
+  81: "/weatherLogos/rain.svg",
+  82: "/weatherLogos/rain.svg",
+  85: "/weatherLogos/snow.svg",
+  86: "/weatherLogos/snow.svg",
+  95: "/weatherLogos/rain.svg",
+  96: "/weatherLogos/rain.svg",
+  99: "/weatherLogos/rain.svg",
+};
 export async function getWeatherData(
   latitude: number,
   longitude: number
 ): Promise<WeatherData> {
   try {
-    
+    console.log(latitude, longitude);
     const response = await fetch(
-        `https://api.open-meteo.com/v1/forecast?` +
+      `https://api.open-meteo.com/v1/forecast?` +
         `latitude=${latitude}&` +
         `longitude=${longitude}&` +
         `current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m,apparent_temperature,pressure_msl&` +
@@ -75,14 +79,13 @@ export async function getWeatherData(
         `wind_speed_unit=kmh&` +
         `precipitation_unit=mm&` +
         `timezone=auto`
-      );
+    );
 
     if (!response.ok) {
       throw new Error("Weather data fetch failed");
     }
     // const data: WeatherResponse = response[0];
     const data: WeatherResponse = await response.json();
-    // console.log('after', data)
     return {
       currentTemp: data.current.temperature_2m,
       weatherCode: data.current.weather_code,
@@ -91,12 +94,18 @@ export async function getWeatherData(
         temp: data.hourly.temperature_2m,
         precipitation: data.hourly.precipitation_probability,
         weatherCode: data.hourly.weather_code,
+        precipitationProb: data.hourly.precipitation_probability,
+        visibility: data.hourly.visibility,
       },
       dailyData: {
         date: data.daily.time,
         maxTemp: data.daily.temperature_2m_max,
         minTemp: data.daily.temperature_2m_min,
         precipitationProb: data.daily.precipitation_probability_max,
+        precipitationSum: data.daily.precipitation_sum,
+        sunrise: data.daily.sunrise,
+        sunset: data.daily.sunset,
+        uvIndex: data.daily.uv_index_max,
       },
       current: {
         relative_humidity_2m: data.current.relative_humidity_2m,
@@ -115,38 +124,37 @@ export function getWeatherDescription(code: number): string {
   return weatherCodeMap[code] || "Unknown";
 }
 
-const weatherLogoMap: { [key: number]: string } = {
-  0: "/weatherLogos/clear.svg",
-  1: "/weatherLogos/mostly_clear.svg",
-  2: "/weatherLogos/partly_cloudy.svg",
-  3: "/weatherLogos/cloudy.svg",
-  45: "/weatherLogos/fog.svg",
-  48: "/weatherLogos/fog.svg",
-  51: "/weatherLogos/drizzle.svg",
-  53: "/weatherLogos/drizzle.svg",
-  55: "/weatherLogos/drizzle.svg",
-  56: "/weatherLogos/freezing_drizzle.svg",
-  57: "/weatherLogos/freezing_drizzle.svg",
-  61: "/weatherLogos/rain.svg",
-  63: "/weatherLogos/rain.svg",
-  65: "/weatherLogos/rain.svg",
-  66: "/weatherLogos/freezing_rain.svg",
-  67: "/weatherLogos/freezing_rain.svg",
-  71: "/weatherLogos/snow.svg",
-  73: "/weatherLogos/snow.svg",
-  75: "/weatherLogos/snow.svg",
-  77: "/weatherLogos/snow.svg",
-  80: "/weatherLogos/showers.svg",
-  81: "/weatherLogos/showers.svg",
-  82: "/weatherLogos/showers.svg",
-  85: "/weatherLogos/snow_showers.svg",
-  86: "/weatherLogos/snow_showers.svg",
-  95: "/weatherLogos/thunderstorm.svg",
-  96: "/weatherLogos/thunderstorm_hail.svg",
-  99: "/weatherLogos/thunderstorm_hail.svg",
-};
-
 export function getWeatherLogo(code: number): string {
   return weatherLogoMap[code] || "/weatherLogos/cloudy.svg";
 }
 
+// const weatherLogoMap: { [key: number]: string } = {
+//   0: "/weatherLogos/clear.svg",
+//   1: "/weatherLogos/mostly_clear.svg",
+//   2: "/weatherLogos/partly_cloudy.svg",
+//   3: "/weatherLogos/cloudy.svg",
+//   45: "/weatherLogos/fog.svg",
+//   48: "/weatherLogos/fog.svg",
+//   51: "/weatherLogos/drizzle.svg",
+//   53: "/weatherLogos/drizzle.svg",
+//   55: "/weatherLogos/drizzle.svg",
+//   56: "/weatherLogos/freezing_drizzle.svg",
+//   57: "/weatherLogos/freezing_drizzle.svg",
+//   61: "/weatherLogos/rain.svg",
+//   63: "/weatherLogos/rain.svg",
+//   65: "/weatherLogos/rain.svg",
+//   66: "/weatherLogos/freezing_rain.svg",
+//   67: "/weatherLogos/freezing_rain.svg",
+//   71: "/weatherLogos/snow.svg",
+//   73: "/weatherLogos/snow.svg",
+//   75: "/weatherLogos/snow.svg",
+//   77: "/weatherLogos/snow.svg",
+//   80: "/weatherLogos/showers.svg",
+//   81: "/weatherLogos/showers.svg",
+//   82: "/weatherLogos/showers.svg",
+//   85: "/weatherLogos/snow_showers.svg",
+//   86: "/weatherLogos/snow_showers.svg",
+//   95: "/weatherLogos/thunderstorm.svg",
+//   96: "/weatherLogos/thunderstorm_hail.svg",
+//   99: "/weatherLogos/thunderstorm_hail.svg",
+// };

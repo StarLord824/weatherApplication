@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FiSettings } from "react-icons/fi";
 import SettingsModal from "./SettingsModal";
 
